@@ -1,9 +1,10 @@
 import os
 import socket
 import hashlib
-import base64
 import requests
-import time
+import base64
+from cryptography.fernet import Fernet
+from datetime import datetime
 
 # ====== Styling ======
 def print_hacker_banner():
@@ -15,20 +16,11 @@ def print_hacker_banner():
 ██║     ██║   ██║██╔═══╝ ██╔══╝  ██╔══╝  ██║   ██║██║   ██║ ╚██╔╝  
 ╚██████╗╚██████╔╝██║     ███████╗███████╗╚██████╔╝╚██████╔╝  ██║   
  ╚═════╝ ╚═════╝ ╚═╝     ╚══════╝╚══════╝ ╚═════╝  ╚═════╝   ╚═╝   
-    Cybersecurity Multitool | Created by Hacky-7 | v2.0
+    Cybersecurity Multitool | Created by Hacky-7 | v5.0
 """
     print(f"\033[92m{banner}\033[0m")
     print("Welcome to the Cybersecurity Multitool! Use responsibly.\n")
 
-def print_menu():
-    print("\033[94mSelect a Tool:\033[0m")
-    print("1. 🔍 Port Scanner")
-    print("2. 🌐 Subdomain Enumerator")
-    print("3. 🔐 Base64 Encoder/Decoder")
-    print("4. 🛡️  SSL Certificate Checker")
-    print("5. 🕵️  Shodan Search")
-    print("6. ❌ Exit")
-    print("\n")
 
 # ====== Tools ======
 
@@ -50,20 +42,29 @@ def port_scanner():
             print(f"[!] Error scanning port {port}: {e}")
     input("\nPress Enter to return to the menu...")
 
-def subdomain_enumerator():
-    domain = input("Enter the Target Domain: ")
-    subdomains = ['www', 'mail', 'ftp', 'dev']
-    print(f"Enumerating subdomains for {domain}...\n")
-    for sub in subdomains:
-        subdomain = f"{sub}.{domain}"
-        try:
-            ip = socket.gethostbyname(subdomain)
-            print(f"[+] {subdomain} resolved to {ip}")
-        except:
-            print(f"[-] {subdomain} not found.")
+
+def md5_hash_generator():
+    text = input("Enter the Text to Hash: ")
+    result = hashlib.md5(text.encode()).hexdigest()
+    print(f"[+] MD5 Hash: {result}")
     input("\nPress Enter to return to the menu...")
 
-def base64_tool():
+
+def whois_lookup():
+    domain = input("Enter the Domain: ")
+    print(f"Performing WHOIS lookup for {domain}...\n")
+    try:
+        response = requests.get(f"https://whois.domaintools.com/{domain}")
+        if response.status_code == 200:
+            print(response.text)
+        else:
+            print(f"[!] Error fetching WHOIS data for {domain}")
+    except Exception as e:
+        print(f"[!] Error: {e}")
+    input("\nPress Enter to return to the menu...")
+
+
+def base64_encoder_decoder():
     action = input("Choose Action (encode/decode): ").strip().lower()
     text = input("Enter the Text: ")
     if action == "encode":
@@ -79,59 +80,92 @@ def base64_tool():
         print("[!] Invalid Action. Choose 'encode' or 'decode'.")
     input("\nPress Enter to return to the menu...")
 
-def ssl_certificate_checker():
-    domain = input("Enter the Domain: ")
-    try:
-        import ssl
-        import datetime
-        context = ssl.create_default_context()
-        with socket.create_connection((domain, 443)) as sock:
-            with context.wrap_socket(sock, server_hostname=domain) as ssock:
-                cert = ssock.getpeercert()
-                valid_until = datetime.datetime.strptime(cert['notAfter'], "%b %d %H:%M:%S %Y %Z")
-                print(f"[+] SSL Certificate valid until: {valid_until}")
-    except Exception as e:
-        print(f"[!] Error checking SSL certificate: {e}")
+
+def aes_encrypt_decrypt():
+    action = input("Choose Action (encrypt/decrypt): ").strip().lower()
+    key = Fernet.generate_key()
+    cipher = Fernet(key)
+    if action == "encrypt":
+        text = input("Enter the Text to Encrypt: ")
+        encrypted = cipher.encrypt(text.encode())
+        print(f"[+] Encrypted Text: {encrypted.decode()}")
+        print(f"[+] Encryption Key: {key.decode()}")
+    elif action == "decrypt":
+        encrypted_text = input("Enter the Text to Decrypt: ")
+        key = input("Enter the Encryption Key: ").encode()
+        try:
+            cipher = Fernet(key)
+            decrypted = cipher.decrypt(encrypted_text.encode())
+            print(f"[+] Decrypted Text: {decrypted.decode()}")
+        except Exception as e:
+            print(f"[!] Error decrypting text: {e}")
     input("\nPress Enter to return to the menu...")
 
-def shodan_search():
-    api_key = input("Enter Your Shodan API Key: ")
-    query = input("Enter the Search Query: ")
-    try:
-        response = requests.get(f"https://api.shodan.io/shodan/host/search?key={api_key}&query={query}")
-        if response.status_code == 200:
-            data = response.json()
-            print(f"[+] Shodan Results: {data}")
-        else:
-            print(f"[!] Shodan Error: {response.text}")
-    except Exception as e:
-        print(f"[!] Shodan API Error: {e}")
-    input("\nPress Enter to return to the menu...")
 
-# ====== Main Loop ======
+# ====== Paginated Menu ======
+
+TOOLS = [
+    "Port Scanner", "Subdomain Enumerator", "Ping Sweep", "Traceroute", "DNS Zone Transfer Checker",
+    "WHOIS Lookup", "IP Geolocation Finder", "Email Validator", "Metadata Extractor", "Social Media Finder",
+    "MD5 Hash Generator", "SHA256 Hash Generator", "Base64 Encoder/Decoder", "Caesar Cipher", "AES Encryption/Decryption",
+    "SQL Injection Tester", "XSS Payload Injector", "Directory Brute-Forcer", "Open Redirect Tester", "Command Injection Tester",
+    "Reverse Shell Generator", "Keylogger Simulator", "Privilege Escalation Checker", "Network Sniffer", "System Info Enumerator",
+    "SSL Certificate Checker", "Website Screenshot Capturer", "Public Breach Checker", "Shodan API Integration", "Google Dorker",
+    "Pastebin Scraper", "HMAC Generator", "RSA Key Generator", "XOR Cipher Tool", "PGP Key Generator",
+    "Password Strength Checker", "Hash Collision Finder", "File Upload Tester", "Local File Inclusion Tester",
+    "Remote File Inclusion Tester", "Shellshock Vulnerability Checker", "Basic Vulnerability Scanner", "Process Hijacking Simulator",
+    "Data Exfiltration Simulator", "Malware Scanner", "Network Mapper", "HTTP Header Analyzer", "Reverse DNS Lookup"
+]
+
+TOOLS_PER_PAGE = 10
+
+
+def show_paginated_menu(page):
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print_hacker_banner()
+    start = (page - 1) * TOOLS_PER_PAGE
+    end = start + TOOLS_PER_PAGE
+    tools = TOOLS[start:end]
+
+    print(f"\033[94mPage {page}/{(len(TOOLS) + TOOLS_PER_PAGE - 1) // TOOLS_PER_PAGE}\033[0m\n")
+    for i, tool in enumerate(tools, start=1):
+        print(f"{i}. {tool}")
+    print("\nN. Next Page")
+    print("B. Previous Page")
+    print("Q. Quit")
+    print("\n")
+
 
 def main():
+    current_page = 1
     while True:
-        print_hacker_banner()
-        print_menu()
-        choice = input("Enter your choice: ").strip()
-        if choice == "1":
-            port_scanner()
-        elif choice == "2":
-            subdomain_enumerator()
-        elif choice == "3":
-            base64_tool()
-        elif choice == "4":
-            ssl_certificate_checker()
-        elif choice == "5":
-            shodan_search()
-        elif choice == "6":
+        show_paginated_menu(current_page)
+        choice = input("Enter your choice: ").strip().lower()
+
+        if choice == "n":
+            if current_page < (len(TOOLS) + TOOLS_PER_PAGE - 1) // TOOLS_PER_PAGE:
+                current_page += 1
+            else:
+                print("\033[91m[!] Already on the last page.\033[0m")
+        elif choice == "b":
+            if current_page > 1:
+                current_page -= 1
+            else:
+                print("\033[91m[!] Already on the first page.\033[0m")
+        elif choice == "q":
             print("\033[91mExiting... Stay Safe! 🛡️\033[0m")
-            time.sleep(1)
             break
+        elif choice.isdigit() and 1 <= int(choice) <= TOOLS_PER_PAGE:
+            tool_index = (current_page - 1) * TOOLS_PER_PAGE + int(choice) - 1
+            if tool_index < len(TOOLS):
+                tool_name = TOOLS[tool_index]
+                print(f"\033[92m[+] Selected Tool: {tool_name}\033[0m")
+                # Call relevant tool function here (e.g., if tool_name == "Port Scanner": port_scanner())
+            else:
+                print("\033[91m[!] Invalid Choice.\033[0m")
         else:
-            print("\033[91m[!] Invalid Choice. Try Again.\033[0m")
-            time.sleep(1)
+            print("\033[91m[!] Invalid Choice.\033[0m")
+
 
 if __name__ == "__main__":
     main()
