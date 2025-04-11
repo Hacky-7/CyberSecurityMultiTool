@@ -1,5 +1,11 @@
-requests
-selenium
-cryptography
-shodan
-pyOpenSSL
+requests==2.28.2        # For making API calls (Shodan, WHOIS, etc.)
+cryptography==41.0.1    # For AES encryption, RSA key generation, and HMAC
+selenium==4.10.0        # For website screenshot capturing
+beautifulsoup4==4.12.2  # For web scraping (e.g., Google Dorker, Pastebin Scraper)
+pyOpenSSL==23.2.0       # For SSL certificate validation
+pandas==2.0.0           # For data analysis and report generation
+scapy==2.5.0            # For packet sniffing and network analysis
+python-nmap==0.7.1      # For network mapping (Nmap integration)
+flask==2.2.5            # For hosting a simple web interface
+pyshodan==0.4.0         # For Shodan API integration
+pyfiglet==0.8.post1     # For ASCII art banners
