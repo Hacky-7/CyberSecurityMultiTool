@@ -47,7 +47,7 @@ Ensure you have the following installed:
 
 ### 2️⃣ Clone the Repository
 ```bash
-git clone https://github.com/Hacky-7/cybersecurity-multitool.git
+git clone https://github.com/Hacky-7/CyberSecurityMultiTool.git
 cd cybersecurity-multitool
 ```
 
@@ -114,7 +114,7 @@ python cybersecurity_multitool.py screenshot https://example.com
 
 ```
 cybersecurity-multitool/
-├── cybersecurity_multitool.py   # Main script
+├── main.py   # Main script
 ├── requirements.txt             # Dependencies
 ├── README.md                    # This file
 └── tools/                       # Individual tools (modular structure)
